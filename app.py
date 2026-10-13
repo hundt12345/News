@@ -99,5 +99,7 @@ def index():
 # ---------------------------------------------------------
 
 if __name__ == "__main__":
-    # bind to 0.0.0.0 so the Arena preview can reach it
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    # For Render deployment: use PORT environment variable, default to 5000
+    port = int(os.getenv("PORT", 5000))
+    # bind to 0.0.0.0 so the Arena preview and Render can reach it
+    app.run(host="0.0.0.0", port=port, debug=False)

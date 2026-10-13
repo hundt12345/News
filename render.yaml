@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: news-aggregator
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: OWM_API_KEY
+        value: ""
