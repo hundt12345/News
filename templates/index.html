@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Lokal‑News‑Aggregator</title>
+    <style>
+        body {font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; line-height: 1.5;}
+        .container {border: 1px solid #ddd; padding: 1rem; border-radius: 8px;}
+        h1 {margin-top:0;}
+        .feed {margin: .5rem 0;}
+        .feed a {color: #0066cc; text-decoration:none;}
+        .feed a:hover {text-decoration:underline;}
+        .summary > div {margin-bottom: .5rem;}
+        .weather {margin-top:1rem; padding: .5rem; background:#f9f9f9; border-radius:4px;}
+        form {margin-bottom:1rem;}
+        input {padding:.4rem;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Lokale News für {{ city or "Ihren Ort" }}</h1>
+
+    <form method="post">
+        <label for="city">Stadt / Stadtteil eingeben:</label>
+        <input id="city" name="city" type="text" value="{{ city }}" placeholder="z. B. Köln‑Mülheim">
+        <button type="submit">Aktualisieren</button>
+    </form>
+
+    {% if weather %}
+    <div class="weather">
+        <strong>{{ weather.city }}</strong>: {{ weather.temp }}°C, {{ weather.desc }}
+    </div>
+    {% endif %}
+
+    <h2>Stream (letzte Einträge)</h2>
+    <div class="feed">
+    {% if stream %}
+        {% for item in stream %}
+            <div>
+                <strong>{{ item.get('source', '??') }}:</strong> 
+                <a href="{{ item.link }}" target="_blank">{{ item.title }}</a>
+                <span style="color:#555; font-size:.9em;">{{ item.published|default('unbekannt') }}</span>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Keine neuen Feeds gefunden. RSS‑URLs in der Config anpassen.</p>
+    {% endif %}
+    </div>
+
+    <h2>Zusammenfassung (letzte 24 h)</h2>
+    {% if summary %}
+        <div class="summary">
+        {% for key, items in summary.items() %}
+            <div>
+                <strong>{{ key|capitalize }}</strong>: 
+                {% for it in items[:3] %}<a href="{{ it.link }}" target="_blank">{{ it.title }}</a>; {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>Keine Artikel der letzten 24 Stunden (oder Feeds liegen länger zurück).</p>
+    {% endif %}
+</div>
+</body>
+</html>
