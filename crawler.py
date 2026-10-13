@@ -43,6 +43,19 @@ SOURCES = {
         None,
         "https://www.stadt-koeln.de/externe-dienste/rss/pressemeldungen.xml",
     ),
+    # Reddit sources - city-specific subreddits and search
+    "Reddit r/Koeln": (
+        None,
+        "https://www.reddit.com/r/koeln/.rss",
+    ),
+    "Reddit r/de": (
+        None,
+        "https://www.reddit.com/r/de/.rss",
+    ),
+    "Reddit r/worldnews": (
+        None,
+        "https://www.reddit.com/r/worldnews/.rss",
+    ),
 }
 
 # --------------------------------------------------------------
@@ -130,6 +143,7 @@ def crawl_for_city(city: str, max_items: int = 30) -> dict:
     Crawl all sources listed in SOURCES that are relevant to *city*.
     The function is city‑aware only by using the city name in the returned
     metadata; the actual source list is static (pre‑discovered).
+    Additionally adds dynamic Reddit sources based on the city name.
 
     Returns a dict with:
         - "stream": list of the newest max_items articles (sorted by date)
@@ -137,7 +151,37 @@ def crawl_for_city(city: str, max_items: int = 30) -> dict:
     """
     all_entries = []
 
-    for source_name, (base_url, rss_url) in SOURCES.items():
+    # Build dynamic sources list - start with static SOURCES
+    sources_to_crawl = dict(SOURCES)
+    
+    # Add city-specific Reddit RSS feeds
+    city_lower = city.lower().strip()
+    city_subreddit = city_lower.replace(" ", "").replace("-", "").replace(".", "")
+    
+    # Add city subreddit if it exists
+    if city_subreddit:
+        sources_to_crawl[f"Reddit r/{city_subreddit}"] = (
+            None,
+            f"https://www.reddit.com/r/{city_subreddit}/.rss",
+        )
+    
+    # Add German city subreddits for common cities
+    german_cities = ["berlin", "hamburg", "munich", "muenchen", "cologne", "koeln", 
+                     "frankfurt", "stuttgart", "dusseldorf", "duesseldorf", "leipzig",
+                     "dresden", "nuremberg", "nuernberg", "hannover", "bremen"]
+    if city_lower in german_cities:
+        sources_to_crawl[f"Reddit r/{city_lower}"] = (
+            None,
+            f"https://www.reddit.com/r/{city_lower}/.rss",
+        )
+    
+    # Also add search for the city on Reddit
+    sources_to_crawl[f"Reddit Search: {city}"] = (
+        None,
+        f"https://www.reddit.com/search.rss?q={city}",
+    )
+
+    for source_name, (base_url, rss_url) in sources_to_crawl.items():
         # ---- If an RSS URL is given, use it directly ---------------------------------
         if rss_url:
             if not _robots_ok(rss_url):
