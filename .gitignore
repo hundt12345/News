@@ -51,3 +51,7 @@ htmlcov/
 
 # Render
 .render/
+
+# Lokaler Laufzeit-Cache der Quellen (wird zur Laufzeit neu aufgebaut)
+cache/
+*.log

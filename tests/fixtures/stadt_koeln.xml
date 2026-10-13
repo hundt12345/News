@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Pressemeldungen Stadt Köln</title>
+    <link>https://www.stadt-koeln.de</link>
+    <description>RSS-Feed der Stadt Köln mit den aktuellen Pressemitteilungen</description>
+    <language>de</language>
+    <item>
+      <title>Soziale Erhaltungssatzung für das Gebiet „Kalk Mitte“</title>
+      <link>https://www.stadt-koeln.de/politik-und-verwaltung/presseservice/soziale-erhaltungssatzung-fuer-das-gebiet-kalk-mitte-1</link>
+      <description>Weitere Erhaltungssatzung für das rechtsrheinische Köln beschlossen</description>
+      <pubDate>Fri, 09 Oct 2026 09:35:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>Bebauungsplanverfahren Feldgärtenstraße in Köln-Niehl</title>
+      <link>https://www.stadt-koeln.de/politik-und-verwaltung/presseservice/bebauungsplanverfahren-feldgaertenstrasse-koeln-niehl</link>
+      <description>Informationsveranstaltung und Beteiligungsmöglichkeit für Bürger*innen</description>
+      <pubDate>Wed, 07 Oct 2026 14:06:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>Neue Blitzer für die Autobahnen 4 (Eifeltor) und 57</title>
+      <link>https://www.stadt-koeln.de/politik-und-verwaltung/presseservice/neue-blitzer-fuer-die-autobahnen-4-eifeltor-und-57</link>
+      <description>Geschwindigkeitsmessgeräte dienen der Erhöhung der Verkehrssicherheit</description>
+      <pubDate>Mon, 12 Oct 2026 14:57:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>Ersatzneubau der Brücke Widdersdorfer Straße</title>
+      <link>https://www.stadt-koeln.de/politik-und-verwaltung/presseservice/ersatzneubau-der-bruecke-widdersdorfer-strasse</link>
+      <description>Stadtrat fasst Baubeschluss – mehr Platz für den Rad- und Fußverkehr</description>
+      <pubDate>Fri, 09 Oct 2026 11:35:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>Musenkuss Köln mit kulturellen Angeboten für die Herbstferien</title>
+      <link>https://www.stadt-koeln.de/politik-und-verwaltung/presseservice/musenkuss-koeln-mit-kulturellen-angeboten-fuer-die-herbstferien</link>
+      <description>Netzwerk bietet kulturelle Bildung für jedes Alter, Schulen und Jugendzentren</description>
+      <pubDate>Tue, 13 Oct 2026 06:53:00 +0100</pubDate>
+    </item>
+  </channel>
+</rss>
