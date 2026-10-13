@@ -1,65 +1,116 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Lokal‑News‑Aggregator</title>
-    <style>
-        body {font-family: Arial, sans-serif; max-width: 800px; margin: 2rem auto; line-height: 1.5;}
-        .container {border: 1px solid #ddd; padding: 1rem; border-radius: 8px;}
-        h1 {margin-top:0;}
-        .feed {margin: .5rem 0;}
-        .feed a {color: #0066cc; text-decoration:none;}
-        .feed a:hover {text-decoration:underline;}
-        .summary > div {margin-bottom: .5rem;}
-        .weather {margin-top:1rem; padding: .5rem; background:#f9f9f9; border-radius:4px;}
-        form {margin-bottom:1rem;}
-        input {padding:.4rem;}
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lokal-Radar · {{ place.headline }}</title>
+  <meta name="description"
+        content="Lokale Nachrichten für Kölner Stadtteile und Veedel – Redaktionen, Polizei, Stadt und Foren, nach Ort und Thema sortiert.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📍</text></svg>">
 </head>
 <body>
-<div class="container">
-    <h1>Lokale News für {{ city or "Ihren Ort" }}</h1>
 
-    <form method="post">
-        <label for="city">Stadt / Stadtteil eingeben:</label>
-        <input id="city" name="city" type="text" value="{{ city }}" placeholder="z. B. Köln‑Mülheim">
-        <button type="submit">Aktualisieren</button>
-    </form>
-
-    {% if weather %}
-    <div class="weather">
-        <strong>{{ weather.city }}</strong>: {{ weather.temp }}°C, {{ weather.desc }}
-    </div>
-    {% endif %}
-
-    <h2>Stream (letzte Einträge)</h2>
-    <div class="feed">
-    {% if stream %}
-        {% for item in stream %}
-            <div>
-                <strong>{{ item.get('source', '??') }}:</strong> 
-                <a href="{{ item.link }}" target="_blank">{{ item.title }}</a>
-                <span style="color:#555; font-size:.9em;">{{ item.published|default('unbekannt') }}</span>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>Keine neuen Feeds gefunden. RSS‑URLs in der Config anpassen.</p>
-    {% endif %}
+<header class="kopf">
+  <div class="kopf-innen">
+    <div class="marke">
+      <span class="logo">📍</span>
+      <div>
+        <h1>Lokal-Radar</h1>
+        <p class="slogan">Nachrichten für dein Veedel – nicht für irgendeins.</p>
+      </div>
     </div>
 
-    <h2>Zusammenfassung (letzte 24 h)</h2>
-    {% if summary %}
-        <div class="summary">
-        {% for key, items in summary.items() %}
-            <div>
-                <strong>{{ key|capitalize }}</strong>: 
-                {% for it in items[:3] %}<a href="{{ it.link }}" target="_blank">{{ it.title }}</a>; {% endfor %}
-            </div>
-        {% endfor %}
-        </div>
-    {% else %}
-        <p>Keine Artikel der letzten 24 Stunden (oder Feeds liegen länger zurück).</p>
+    {% if daten.wetter %}
+    <div class="wetter" title="Quelle: {{ daten.wetter.quelle }}">
+      <span class="wetter-icon">{{ daten.wetter.icon }}</span>
+      <span class="wetter-temp">{{ daten.wetter.temp }}°</span>
+      <span class="wetter-text">
+        {{ daten.wetter.text }}
+        {% if daten.wetter.min is not none %}
+        <small>{{ daten.wetter.min }}–{{ daten.wetter.max }}°</small>
+        {% endif %}
+      </span>
+    </div>
     {% endif %}
+  </div>
+
+  <form class="suche" method="get" action="{{ url_for('index') }}" id="suchformular">
+    <div class="suchzeile">
+      <label class="sr-only" for="ort">Stadtteil, Veedel oder Bezirk</label>
+      <input id="ort" name="ort" type="search" list="ortliste" autocomplete="off"
+             value="{{ ort }}" placeholder="z. B. Ehrenfeld, Köln-Nippes, Südstadt, Deutz …"
+             spellcheck="false">
+      <datalist id="ortliste">
+        {% for o in orte %}
+        <option value="{{ o.name }}">{{ o.typ }} · Bezirk {{ o.bezirk }}</option>
+        {% endfor %}
+      </datalist>
+      <button type="submit" class="knopf primaer">Anzeigen</button>
+      <button type="button" class="knopf" id="aktualisieren"
+              title="Quellen neu abrufen (Cache ignorieren)">↻ Aktualisieren</button>
+    </div>
+
+    <div class="filterzeile">
+      <fieldset class="themen">
+        <legend class="sr-only">Quellenarten</legend>
+        {% for t in alle_themen %}
+        <label class="chip">
+          <input type="checkbox" name="themen" value="{{ t }}"
+                 {% if t in themen %}checked{% endif %}>
+          <span>{{ THEMEN_LABEL[t] }}</span>
+        </label>
+        {% endfor %}
+      </fieldset>
+
+      <div class="schnellwahl" id="schnellwahl">
+        {% for name in ['Innenstadt', 'Ehrenfeld', 'Nippes', 'Lindenthal', 'Mülheim',
+                        'Kalk', 'Porz', 'Chorweiler', 'Rodenkirchen'] %}
+          <button type="button" class="chip ort-chip" data-ort="Bezirk {{ name }}"
+                  {% if place.bezirk == name %}aria-pressed="true"{% endif %}>
+            {{ name }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if daten.place.nachbarn %}
+    <div class="nachbarn">
+      <span class="nachbarn-titel">Im Bezirk {{ daten.place.bezirk }} außerdem:</span>
+      {% for n in daten.place.nachbarn %}
+        <button type="button" class="chip mini" data-ort="{{ n }}">{{ n }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </form>
+</header>
+
+{% if daten.demo %}
+<div class="demo-hinweis">
+  <strong>Demo-Modus</strong> – gespeicherte Original-Feeds vom 13.10.2026 statt Live-Abruf.
+  <a href="{{ url_for('index', ort=ort) }}">Live-Daten laden</a>
 </div>
+{% endif %}
+
+<main class="inhalt" id="ergebnisse">
+  {% include 'partials/results.html' %}
+</main>
+
+<footer class="fuss">
+  <p>
+    <span id="stand">Stand: {{ daten.generated_at|zeitpunkt }}</span>
+    · Quellen: KSTA (Stadtteil- &amp; Bezirksfeeds), Rundschau, EXPRESS, koeln.de,
+      Polizei Köln, Stadt Köln, Reddit&nbsp;r/Koeln &amp; r/cologne, KOELN·0221
+    · <a href="{{ url_for('api_quellen', ort=ort) }}" target="_blank" rel="noopener">Quellenplan ansehen</a>
+  </p>
+  <p class="klein">
+    Alle Artikel bleiben bei den jeweiligen Redaktionen. Der Aggregator zeigt nur
+    Titel, Anriss und Link. Automatisch alle 5 Minuten, oder per Hand mit „Aktualisieren".
+  </p>
+</footer>
+
+<div class="ladung" id="ladung" hidden>Quellen werden abgefragt …</div>
+
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </body>
 </html>

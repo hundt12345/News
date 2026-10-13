@@ -1,11 +1,45 @@
+# Deployment-Vorlage für render.com (Blueprint: Repo verbinden, fertig).
+#
+# Alle Secrets sind leer vorbelegt – der Dienst läuft auch ohne sie.
+# Ohne REDDIT_CLIENT_ID/SECRET fragt die App Reddit anonym an (funktioniert,
+# wird von Reddit aber strenger gedrosselt).
 services:
   - type: web
-    name: news-aggregator
+    name: lokal-radar
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
+    healthCheckPath: /health
     envVars:
       - key: PORT
         value: "10000"
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      # --- optional: Wetter über OpenWeatherMap (sonst Open-Meteo, ohne Key)
       - key: OWM_API_KEY
-        value: ""
+        sync: false
+      # --- optional: eigene Reddit-App (https://www.reddit.com/prefs/apps)
+      #     Erhöht das Limit deutlich; ohne sie wird anonym gefragt.
+      - key: REDDIT_CLIENT_ID
+        sync: false
+      - key: REDDIT_CLIENT_SECRET
+        sync: false
+      # --- optional: Spiegel-Host für Reddit, falls reddit.com blockt
+      - key: REDDIT_MIRROR
+        sync: false
+      # --- Feinsteuerung ( Defaults stehen hier, damit sie sichtbar sind)
+      - key: NEWS_CACHE_DIR
+        value: "cache"
+      - key: NEWS_SOURCE_TTL
+        value: "300"
+      - key: NEWS_STALE_MAX_AGE
+        value: "86400"
+      - key: NEWS_MAX_ALTER_TAGE
+        value: "60"
+      - key: NEWS_MAX_WORKERS
+        value: "8"
+      - key: NEWS_DEMO
+        value: "0"
+      - key: FLASK_DEBUG
+        value: "0"

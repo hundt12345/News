@@ -1,0 +1,72 @@
+{#- Bausteine für Artikelkarten und Quellendiagnose -#}
+{% macro karte(item) -%}
+<article class="karte k-{{ item.category }} s-{{ item.scope }}"
+         data-zeit="{{ item.published or '' }}" data-id="{{ item.link }}">
+  <div class="karten-kopf">
+    <span class="abzeichen kategorie" title="{{ KATEGORIEN[item.category].info }}">
+      {{ KATEGORIEN[item.category].icon }} {{ KATEGORIEN[item.category].label }}
+    </span>
+    {% if item.scope == 'veedel' %}<span class="abzeichen veedel">dein Veedel</span>
+    {% elif item.scope == 'bezirk' %}<span class="abzeichen bezirk">Bezirk</span>
+    {% elif item.kind == 'forum' %}<span class="abzeichen forum">Forum</span>{% endif %}
+    <time class="zeit" datetime="{{ item.published or '' }}"
+          title="{{ item.published|zeitpunkt }}">{{ item.published|relativ }}</time>
+  </div>
+
+  <h3><a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>
+
+  {% if item.teaser %}<p class="anriss">{{ item.teaser }}</p>{% endif %}
+
+  <div class="karten-fuss">
+    <span class="quelle" title="{{ item.link }}">{{ item.source }}</span>
+    {% if item.also_from %}<span class="auch" title="gleiche Meldung auch hier">
+      auch: {{ item.also_from[:2]|join(' · ') }}</span>{% endif %}
+    {% if item.author %}<span class="autor">{{ item.author }}</span>{% endif %}
+    {% if item.evidence %}<span class="warum" title="{{ item.evidence|join(' · ') }}">
+      ⌖ {{ item.evidence[0] }}</span>{% endif %}
+  </div>
+</article>
+{%- endmacro %}
+
+
+{% macro liste(items, leer_text) -%}
+  {% if items %}
+    <div class="gitter">
+      {% for item in items %}{{ karte(item) }}{% endfor %}
+    </div>
+  {% else %}
+    <p class="leer">{{ leer_text }}</p>
+  {% endif %}
+{%- endmacro %}
+
+
+{% macro quellprotokoll(quellen) -%}
+<details class="protokoll">
+  <summary>
+    Quellen-Protokoll
+    <span class="zaehler">
+      {{ daten.stats.quellen_ok }} von {{ daten.stats.quellen_gesamt }} erreichbar
+    </span>
+  </summary>
+  <table>
+    <thead>
+      <tr><th>Quelle</th><th>Status</th><th>Artikel</th><th>Dauer</th><th>Weg</th></tr>
+    </thead>
+    <tbody>
+    {% for q in quellen %}
+      <tr class="{{ 'ok' if q.ok else 'fehler' }}">
+        <td><span class="gruppe g-{{ q.group }}">{{ q.group }}</span> {{ q.name }}</td>
+        <td>
+          {% if q.ok %}✔{% else %}✖{% endif %}
+          {% if q.error %}<span class="fehlertext">{{ q.error }}</span>{% endif %}
+          {% if q.hint %}<div class="tipp">{{ q.hint }}</div>{% endif %}
+        </td>
+        <td>{{ q.count }}</td>
+        <td>{{ '%.1f'|format(q.seconds) }} s</td>
+        <td class="weg">{{ q.used or '–' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+{%- endmacro %}

@@ -1,0 +1,90 @@
+{%- from 'partials/_macros.html' import karte, liste, quellprotokoll with context -%}
+{#-
+  Wird sowohl serverseitig (erster Aufruf) als auch für „Aktualisieren"
+  gerendert – dadurch gibt es genau **eine** Quelle für das Markup.
+-#}
+
+{% set stats = daten.stats %}
+{% set abschnitte = daten.sections %}
+{% set kategorien = daten.categories %}
+
+{% if daten.warnungen %}
+  <div class="warnungen">
+    {% for w in daten.warnungen %}<p>⚠️ {{ w }}</p>{% endfor %}
+  </div>
+{% endif %}
+
+<div class="lage">
+  <div class="lage-zeile">
+    <strong>{{ stats.artikel_behalten }}</strong> relevante Meldungen
+    <span class="trenner">·</span>
+    <strong>{{ stats.veedel_treffer }}</strong> direkt aus dem Veedel
+    <span class="trenner">·</span>
+    <strong>{{ stats.bezirk_treffer }}</strong> aus dem Bezirk
+    <span class="trenner">·</span>
+    {{ stats.quellen_ok }}/{{ stats.quellen_gesamt }} Quellen
+    <span class="trenner">·</span>
+    {{ daten.duration_s }} s Ladezeit
+  </div>
+
+  {% if daten.top_themen %}
+  <div class="themen-zeile" id="themen-zeile">
+    {% for kat, anzahl in daten.top_themen.items() %}
+      <button type="button" class="chip themen-chip" data-kategorie="{{ kat }}"
+              data-ansicht="themen" title="{{ KATEGORIEN[kat].info }}">
+        {{ KATEGORIEN[kat].icon }} {{ KATEGORIEN[kat].label }}
+        <span class="anzahl">{{ anzahl }}</span>
+      </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="ansicht-umschalter" role="tablist">
+  <button type="button" class="schalter aktiv" data-ansicht="veedel" role="tab">
+    📍 Nach Ort
+  </button>
+  <button type="button" class="schalter" data-ansicht="themen" role="tab">
+    🗂️ Nach Thema
+  </button>
+</div>
+
+{# ---------------- Ansicht 1: nach Ort (Veedel / Bezirk / Köln) ---------- #}
+<div class="ansicht" id="ansicht-veedel">
+  {% for abschnitt in abschnitte %}
+    <section class="block" id="block-{{ abschnitt.key }}">
+      <header class="block-kopf">
+        <h2>
+          {% if abschnitt.key == 'veedel' %}📍
+          {% elif abschnitt.key == 'bezirk' %}🧭
+          {% else %}🏙️{% endif %}
+          {{ abschnitt.label }}
+          <span class="anzahl">{{ abschnitt.artikel|length }}</span>
+        </h2>
+        <p class="hinweis">{{ abschnitt.hinweis }}</p>
+      </header>
+      {{ liste(abschnitt.artikel,
+               'Hier ist gerade nichts – die Lokalredaktion hat zu diesem Veedel aktuell keine Meldung. Weiter unten steht, was im Bezirk und in Köln los ist.') }}
+    </section>
+  {% else %}
+    <p class="leer">Keine Daten erhalten. Sieh ins Quellen-Protokoll.</p>
+  {% endfor %}
+</div>
+
+{# ---------------- Ansicht 2: nach Thema -------------------------------- #}
+<div class="ansicht" id="ansicht-themen" hidden>
+  {% for kat, info in kategorien.items() %}
+    <section class="block" id="thema-{{ kat }}">
+      <header class="block-kopf">
+        <h2>{{ info.icon }} {{ info.label }}
+          <span class="anzahl">{{ info.artikel|length }}</span></h2>
+        <p class="hinweis">{{ info.info }}</p>
+      </header>
+      {{ liste(info.artikel, 'Keine Meldungen in dieser Kategorie.') }}
+    </section>
+  {% else %}
+    <p class="leer">Keine Kategorien vorhanden.</p>
+  {% endfor %}
+</div>
+
+{{ quellprotokoll(daten.sources) }}

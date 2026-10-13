@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <category term="Koeln" label="r/Koeln"/>
+  <updated>2026-10-13T08:00:00+00:00</updated>
+  <id>/r/Koeln/new/</id>
+  <link href="https://www.reddit.com/r/Koeln/new/" rel="alternate" type="text/html"/>
+  <link href="https://www.reddit.com/r/Koeln/new/.rss" rel="self" type="application/atom+xml"/>
+  <title>neu in r/Koeln</title>
+  <entry>
+    <author><name>/u/veedelskind</name><uri>https://www.reddit.com/user/veedelskind</uri></author>
+    <category term="Koeln" label="r/Koeln"/>
+    <content type="html">&lt;p&gt;Seit Wochen Baustelle an der Venloer Straße in Ehrenfeld, kommt da noch was?&lt;/p&gt;</content>
+    <id>t3_1hq9a1b</id>
+    <link href="https://www.reddit.com/r/Koeln/comments/1hq9a1b/baustelle_venloer_strasse/" rel="alternate" type="text/html"/>
+    <updated>2026-10-12T18:00:00+00:00</updated>
+    <published>2026-10-12T18:00:00+00:00</published>
+    <title>Baustelle Venloer Straße in Ehrenfeld – kommt da noch was?</title>
+  </entry>
+  <entry>
+    <author><name>/u/rheinlaender</name><uri>https://www.reddit.com/user/rheinlaender</uri></author>
+    <category term="Koeln" label="r/Koeln"/>
+    <content type="html">&lt;p&gt;Die KVB meldet heute wieder Störungen auf der Linie 5.&lt;/p&gt;</content>
+    <id>t3_1hq9a2c</id>
+    <link href="https://www.reddit.com/r/Koeln/comments/1hq9a2c/kvb_linie_5/" rel="alternate" type="text/html"/>
+    <updated>2026-10-12T12:30:00+00:00</updated>
+    <published>2026-10-12T12:30:00+00:00</published>
+    <title>KVB Linie 5 wieder mit Störungen</title>
+  </entry>
+  <entry>
+    <author><name>/u/auswerts</name><uri>https://www.reddit.com/user/auswerts</uri></author>
+    <category term="Koeln" label="r/Koeln"/>
+    <content type="html">&lt;p&gt;In Hamburg ist das Wetter auch nicht besser.&lt;/p&gt;</content>
+    <id>t3_1hq9a3d</id>
+    <link href="https://www.reddit.com/r/Koeln/comments/1hq9a3d/hamburg_wetter/" rel="alternate" type="text/html"/>
+    <updated>2026-10-11T09:10:00+00:00</updated>
+    <published>2026-10-11T09:10:00+00:00</published>
+    <title>Wetter in Hamburg ist auch nicht besser</title>
+  </entry>
+</feed>
