@@ -211,6 +211,9 @@ liefert daraus `{"stream": [...], "summary": {kategorie: [...]}, "raw": daten}`.
 | `NEWS_STALE_MAX_AGE` | `86400` | so lange darf ein letzter guter Stand verwendet werden |
 | `NEWS_MAX_ALTER_TAGE` | `60` | Meldungen, die älter sind, werden verworfen |
 | `NEWS_MAX_WORKERS` | `8` | parallele Abrufe |
+| `NEWS_HTTP_TIMEOUT` | `9` | HTTP-Timeout pro Feed-Abruf in Sekunden |
+| `NEWS_HTTP_RETRIES` | `2` | Wiederholungen bei Netzwerkfehlern/HTTP 5xx/429 |
+| `NEWS_ROBOTS_TIMEOUT` | `5` | Timeout für `robots.txt` in Sekunden |
 | `OWM_API_KEY` | – | Wetter über OpenWeatherMap; **ohne** Key wird Open-Meteo genutzt, ohne Key und ohne Antwort verschwindet das Wetter-Widget |
 | `REDDIT_CLIENT_ID` / `REDDIT_CLIENT_SECRET` | – | eigene Reddit-App → deutlich höhere Limits |
 | `REDDIT_MIRROR` | – | Ausweich-Host, falls `reddit.com` blockt |
@@ -269,7 +272,11 @@ tests/                  49 Offline-Tests + fixtures/
 
 `render.yaml` liegt bei: neues Web Service anlegen, Repo verbinden, fertig.
 Der Health-Check läuft gegen `/health`. `PORT` wird von Render gesetzt;
-`app.py` bindet auf `0.0.0.0`.
+`app.py` bindet auf `0.0.0.0`. Die Render-Konfiguration begrenzt externe
+Feed-Abrufe auf 4 Sekunden ohne Retry (robots.txt: 2 Sekunden), damit ein
+unerreichbarer Publisher nicht den gesamten Seitenaufruf festhält. Fehler
+werden im Quellen-Protokoll angezeigt; lokal gelten weiterhin die großzügigeren
+Standardwerte.
 
 Für andere Hoster: `pip install -r requirements.txt`, dann
 `gunicorn -b 0.0.0.0:$PORT 'app:app'` (Gunicorn ist bewusst keine harte

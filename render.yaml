@@ -39,6 +39,14 @@ services:
         value: "60"
       - key: NEWS_MAX_WORKERS
         value: "8"
+      # Begrenzte Wartezeit bei externen Feeds: Render soll auch dann antworten,
+      # wenn einzelne Publisher/Reddit nicht erreichbar sind.
+      - key: NEWS_HTTP_TIMEOUT
+        value: "4"
+      - key: NEWS_HTTP_RETRIES
+        value: "0"
+      - key: NEWS_ROBOTS_TIMEOUT
+        value: "2"
       - key: NEWS_DEMO
         value: "0"
       - key: FLASK_DEBUG

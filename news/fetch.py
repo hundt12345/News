@@ -21,6 +21,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import os
 import re
 import threading
 import time
@@ -40,8 +41,12 @@ USER_AGENT = (
     "NewsAggregator/2.0 (+https://github.com/hundt12345/News)"
 )
 
-DEFAULT_TIMEOUT = 9
-MAX_RETRIES = 2
+# Requests are deliberately bounded so a slow or blocked publisher cannot keep
+# the page request open indefinitely. Render can use shorter values without
+# making local development as aggressive.
+DEFAULT_TIMEOUT = max(0.1, float(os.environ.get("NEWS_HTTP_TIMEOUT", "9")))
+MAX_RETRIES = max(0, int(os.environ.get("NEWS_HTTP_RETRIES", "2")))
+ROBOTS_TIMEOUT = max(0.1, float(os.environ.get("NEWS_ROBOTS_TIMEOUT", "5")))
 
 # optionale eigene Reddit-App (https://www.reddit.com/prefs/apps)
 REDDIT_CLIENT_ID = ""
@@ -143,7 +148,7 @@ def session() -> requests.Session:
     return s
 
 
-def robots_ok(url: str, timeout: int = 5) -> bool:
+def robots_ok(url: str, timeout: float = ROBOTS_TIMEOUT) -> bool:
     """robots.txt-Prüfung mit Cache.
 
     Wichtig: Wir holen ``robots.txt`` über **dieselbe** Session (Browser-UA),
@@ -179,7 +184,7 @@ def robots_ok(url: str, timeout: int = 5) -> bool:
     return allowed
 
 
-def _get(url: str, timeout: int = DEFAULT_TIMEOUT, **kw) -> requests.Response:
+def _get(url: str, timeout: float = DEFAULT_TIMEOUT, **kw) -> requests.Response:
     """GET mit Retries, Backoff und ``Retry-After``-Respektierung."""
     last_exc: Exception | None = None
     for attempt in range(MAX_RETRIES + 1):
@@ -366,7 +371,7 @@ def fetch_rss(name: str, url: str, kind: str = "news", group: str = "medien") ->
 def discover_feed_url(page_url: str) -> str | None:
     """Findet im HTML einer Seite einen ``<link rel="alternate" ...>``-Feed."""
     try:
-        resp = _get(page_url, timeout=6)
+        resp = _get(page_url, timeout=min(DEFAULT_TIMEOUT, 6))
         if resp.status_code != 200:
             return None
         soup = BeautifulSoup(resp.text[:400_000], "html.parser")
